@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.serena</groupId>
+        <artifactId>plugins-build-parent</artifactId>
+        <version>CURRENT</version>
+        <relativePath>../plugins-build-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>MicroFocus-SRF</artifactId>
+    <packaging>pom</packaging>
+    <name>MicroFocus-SRF</name>
+    <description>MicroFocus Unified StormRunner Functional (SRF) Plugin</description>
+    <version>1.0</version>
+
+    <properties>
+        <air.plugin.build.script.relative.path>../plugins-build-parent</air.plugin.build.script.relative.path>
+        <mininum.server.version.needed>6.2</mininum.server.version.needed>
+        <plugin.major.version>1</plugin.major.version>
+        <plugin.build.version>SNAPSHOT</plugin.build.version>
+    </properties>
+
+    <dependencies>
+        <!-- These dependencies are used by the ExampleRESTHelper class. -->
+        <!-- If you set scope to "runtime" the dependencies will be copied into your plugins's zip file. -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20140107</version>
+        </dependency>
+        <!-- These dependencies are required for the Serena helper classes and build process. -->
+        <dependency>
+            <groupId>com.serena</groupId>
+            <artifactId>air-plugin-ant-tasks</artifactId>
+            <version>CURRENT</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.serena</groupId>
+            <artifactId>plugins-commons</artifactId>
+            <version>CURRENT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.serena</groupId>
+            <artifactId>plugins-commons</artifactId>
+            <version>CURRENT</version>
+            <classifier>sources</classifier>
+            <type>zip</type>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.name}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
