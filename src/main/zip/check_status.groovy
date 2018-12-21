@@ -1,10 +1,10 @@
 // --------------------------------------------------------------------------------
-// Check the status of load test run
+// Check the status of functional test run
 // --------------------------------------------------------------------------------
 
 import com.serena.air.StepFailedException
 import com.serena.air.StepPropertiesHelper
-import com.serena.air.plugin.srl.SRLHelper
+import com.serena.air.plugin.srf.SRFHelper
 import com.urbancode.air.AirPluginTool
 
 //
@@ -28,11 +28,11 @@ File workDir = new File('.').canonicalFile
 final def  apTool = new AirPluginTool(this.args[0], this.args[1])
 final def  props  = new StepPropertiesHelper(apTool.getStepProperties(), true)
 
-String srlServerUrl = props.notNull('srlServerUrl')
-String srlUser = props.notNull('srlUser')
-String srlPassword = props.notNull('srlPassword')
+String srfServerUrl = props.notNull('srfServerUrl')
+String srfUser = props.notNull('srfUser')
+String srfPassword = props.notNull('srfPassword')
 long tenantId = props.notNullInt('tenantId')
-long projectId = props.notNullInt('projectId')
+long workspaceId = props.notNullInt('workspaceId')
 long runId = props.notNullInt('runId')
 boolean pollStatus = props.optionalBoolean('pollStatus', false)
 long pollInterval = props.optionalInt('pollInterval', 60)
@@ -46,11 +46,11 @@ println "----------------------------------------"
 // Print out each of the property values.
 //
 println "Working directory: ${workDir.canonicalPath}"
-println "StormRunner Server URL: ${srlServerUrl}"
-println "StormRunner User: ${srlUser}"
-println "StormRunner Password: ${srlPassword}"
+println "StormRunner Server URL: ${srfServerUrl}"
+println "StormRunner User: ${srfUser}"
+println "StormRunner Password: ${srfPassword}"
 println "Tenant Id: ${tenantId}"
-println "Project Id: ${projectId}"
+println "Workspace Id: ${workspaceId}"
 println "Test Run Id: ${runId}"
 println "Poll Status: ${pollStatus}"
 println "Poll Interval: ${pollInterval}"
@@ -68,20 +68,20 @@ def runStatus
 // The main body of the plugin step - wrap it in a try/catch statement for handling any exceptions.
 //
 try {
-    SRLHelper srlClient = new SRLHelper(srlServerUrl, srlUser, srlPassword)
-    srlClient.setTenantId(tenantId)
-    srlClient.setSSL()
-    srlClient.login()
-    srlClient.setDebug(debugMode)
+    SRFHelper srfClient = new SRFHelper(srfServerUrl, srfUser, srfPassword)
+    srfClient.setTenantId(tenantId)
+    srfClient.setSSL()
+    srfClient.login()
+    srfClient.setDebug(debugMode)
 
-    testRunStatus = srlClient.runStatus(Long.toString(runId))
+    testRunStatus = srfClient.runStatus(Long.toString(workspaceId), Long.toString(runId))
     println "Test run ${runId} status: ${testRunStatus}"
 
     if (pollStatus) {
-        while (testRunStatus.equals("in-progress")) {
+        while (testRunStatus.equals("running")) {
             println "Test run ${runId} is in-progress... sleeping..."
             sleep(pollInterval*1000)
-            testRunStatus = srlClient.runStatus(Long.toString(runId))
+            testRunStatus = srfClient.runStatus(Long.toString(workspaceId), Long.toString(runId))
         }
         println "Test run ${runId} final status: ${testRunStatus}"
     }

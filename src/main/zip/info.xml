@@ -70,7 +70,7 @@
   called to execute the targets in the build.xml.
   -->
 
-  <tool-description>StormRunner Load provides you with the tools to create load tests and generate the metrics to analyze your application's system performance.</tool-description>
+  <tool-description>StormRunner Functional provides you with the tools to create functional tests and generate the metrics to analyze your application's system functionality.</tool-description>
 
   <!--
   **related-info is NOT required**
@@ -89,8 +89,8 @@
   </related-info>
   -->
   <related-info>
-    <link title="Micro Focus Storm Runner Load website" type="WEBSITE" description="Micro Focus Storm Runner Load website"
-          url="https://www.microfocus.com/en-us/products/stormrunner-load-agile-cloud-testing/overview"/>
+    <link title="Micro Focus Storm Runner Functional website" type="WEBSITE" description="Micro Focus Storm Runner Functional website"
+          url="https://www.microfocus.com/en-us/products/functional-testing-as-a-service/overview"/>
   </related-info>
   <!--
   **meta-html in NOT required**

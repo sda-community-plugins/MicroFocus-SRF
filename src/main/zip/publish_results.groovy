@@ -4,7 +4,7 @@
 
 import com.serena.air.StepFailedException
 import com.serena.air.StepPropertiesHelper
-import com.serena.air.plugin.srl.SRLHelper
+import com.serena.air.plugin.srf.SRFHelper
 import com.urbancode.air.AirPluginTool
 
 //
@@ -27,11 +27,11 @@ File workDir = new File('.').canonicalFile
 final def  apTool = new AirPluginTool(this.args[0], this.args[1])
 final def  props  = new StepPropertiesHelper(apTool.getStepProperties(), true)
 
-String srlServerUrl = props.notNull('srlServerUrl')
-String srlUser = props.notNull('srlUser')
-String srlPassword = props.notNull('srlPassword')
+String srfServerUrl = props.notNull('srfServerUrl')
+String srfUser = props.notNull('srfUser')
+String srfPassword = props.notNull('srfPassword')
 long tenantId = props.notNullInt('tenantId')
-long projectId = props.notNullInt('projectId')
+long workspaceId = props.notNullInt('workspaceId')
 long runId = props.notNullInt('runId')
 String outputFile = props.notNull("outputFile")
 boolean debugMode = props.optionalBoolean("debugMode", false)
@@ -44,11 +44,11 @@ println "----------------------------------------"
 // Print out each of the property values.
 //
 println "Working directory: ${workDir.canonicalPath}"
-println "StormRunner Server URL: ${srlServerUrl}"
-println "StormRunner User: ${srlUser}"
-println "StormRunner Password: ${srlPassword}"
+println "StormRunner Server URL: ${srfServerUrl}"
+println "StormRunner User: ${srfUser}"
+println "StormRunner Password: ${srfPassword}"
 println "Tenant Id: ${tenantId}"
-println "Project Id: ${projectId}"
+println "Workspace Id: ${workspaceId}"
 println "Test Run Id: ${runId}"
 println "Output File: ${outputFile}"
 println "Debug mode value: ${debugMode}"
@@ -65,13 +65,14 @@ def exitCode = 0
 //
 try {
 
-    SRLHelper srlClient = new SRLHelper(srlServerUrl, srlUser, srlPassword)
-    srlClient.setTenantId(tenantId)
-    srlClient.setSSL()
-    srlClient.login()
-    srlClient.setDebug(debugMode)
+    SRFHelper srfClient = new SRFHelper(srfServerUrl, srfUser, srfPassword)
+    srfClient.setTenantId(tenantId)
+    srfClient.setSSL()
+    srfClient.login()
+    srfClient.setDebug(debugMode)
 
-    def runResults = srlClient.runResults(Long.toString(runId))
+    def runResults = srfClient.runResults(Long.toString(workspaceId), Long.toString(runId))
+    def entity = runResults?.entities[0]
     def sb = new StringBuilder()
     sb << """
 <style type='text/css'>
@@ -85,6 +86,8 @@ try {
     a:hover { text-decoration: none; }
     span { font-weight: bold; }
     span.failed { color: #df1e1e; }
+    span.errored { color: #df1e1e; }
+    span.completed { color: #32ad12; }
     span.success { color: #32ad12; }
     table { border-collapse: collapse; width: 100%; color: #333; }
     table td, table th { border: 1px solid #ddd; }
@@ -96,18 +99,16 @@ try {
 </style>
 """
     sb << "<div> <table> <tr> <th colspan='2'>Test Run: ${runId} </th> </tr>"
-    sb << "<tr> <td> Date & time </td> <td> ${runResults?.dateTime} </td> </tr>"
-    sb << "<tr> <td> Status </td> <td> <span class=" + (("PASSED".equalsIgnoreCase(runResults?.status)) ? "success >" : "failed >") +  runResults?.status + "</td> </tr>"
-    sb << "<tr> <td> Duration </td> <td> ${runResults?.duration} </td> </tr>"
-    sb << "<tr> <td> GUI Vusers </td> <td> " + srlClient.fNull(runResults?.uiVusers) + " </td> </tr>"
-    sb << "<tr> <td> GUI VUH </td> <td> " + srlClient.fNull(runResults?.uiVUH) + " </td> </tr>"
-    sb << "<tr> <td> Average Throughput </td> <td> " + srlClient.fNull(runResults?.averageThroughput) + " </td> </tr>"
-    sb << "<tr> <td> Total Throughput </td> <td> " + srlClient.fNull(runResults?.totalThroughput) + " </td> </tr>"
-    sb << "<tr> <td> Average Hits </td> <td> " + srlClient.fNull(runResults?.averageHits) + " </td> </tr>"
-    sb << "<tr> <td> Total Hits </td> <td> " + srlClient.fNull(runResults?.totalHits) + " </td> </tr>"
-    sb << "<tr> <td> Total Transactions Passed </td> <td> " + srlClient.fNull(runResults?.totalTransactionsPassed) + " </td> </tr>"
-    sb << "<tr> <td> Total Transactions Failed </td> <td> " + srlClient.fNull(runResults?.totalTransactionsFailed) + " </td> </tr>"
-    String url = "${srlServerUrl}/run-overview/${runId}/dashboard/?TENANTID=${tenantId}&projectId=${projectId}"
+    sb << "<tr> <td> Test Name </td> <td> ${entity?.name} </td> </tr>"
+    sb << "<tr> <td> Test Type </td> <td> ${entity?.testType} </td> </tr>"
+    sb << "<tr> <td> Date & time </td> <td> ${entity?.start} </td> </tr>"
+    sb << "<tr> <td> Status </td> <td> <span class=${entity?.status}> ${entity?.status} </span> </td> </tr>"
+    sb << "<tr> <td> User </td> <td> ${entity?.user?.name} </td> </tr>"
+    sb << "<tr> <td> Total Environments </td> <td> " + srfClient.fNull(entity?.additionalData?.environmentCount) + " </td> </tr>"
+    sb << "<tr> <td> Total Scripts </td> <td> " + srfClient.fNull(entity?.additionalData?.scriptCount) + " </td> </tr>"
+    sb << "<tr> <td> Total Scripts Successful </td> <td> " + srfClient.fNull(entity?.additionalData?.scriptStatus?.success) + " </td> </tr>"
+    sb << "<tr> <td> Total Scripts Failed </td> <td> " + srfClient.fNull(entity?.additionalData?.scriptStatus?.failed) + " </td> </tr>"
+    String url = "${srfServerUrl}/workspace/${workspaceId}/results/${runId}/details?TENANTID=${tenantId}"
     sb << "<tr> <td> Run URL" + "</td> <td> <a href='${url}'  target=_blank>" + url + "</a> </td> </tr>"
     sb << "<br>"
     sb << "</table> </div>"

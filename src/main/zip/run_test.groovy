@@ -1,10 +1,10 @@
 // --------------------------------------------------------------------------------
-// Run a load test
+// Run a functional test
 // --------------------------------------------------------------------------------
 
 import com.serena.air.StepFailedException
 import com.serena.air.StepPropertiesHelper
-import com.serena.air.plugin.srl.SRLHelper
+import com.serena.air.plugin.srf.SRFHelper
 import com.urbancode.air.AirPluginTool
 
 //
@@ -28,11 +28,11 @@ File workDir = new File('.').canonicalFile
 final def  apTool = new AirPluginTool(this.args[0], this.args[1])
 final def  props  = new StepPropertiesHelper(apTool.getStepProperties(), true)
 
-String srlServerUrl = props.notNull('srlServerUrl')
-String srlUser = props.notNull('srlUser')
-String srlPassword = props.notNull('srlPassword')
+String srfServerUrl = props.notNull('srfServerUrl')
+String srfUser = props.notNull('srfUser')
+String srfPassword = props.notNull('srfPassword')
 long tenantId = props.notNullInt('tenantId')
-long projectId = props.notNullInt('projectId')
+long workspaceId = props.notNullInt('workspaceId')
 long testId = props.notNullInt('testId')
 boolean debugMode = props.optionalBoolean("debugMode", false)
 
@@ -44,11 +44,11 @@ println "----------------------------------------"
 // Print out each of the property values.
 //
 println "Working directory: ${workDir.canonicalPath}"
-println "StormRunner Server URL: ${srlServerUrl}"
-println "StormRunner User: ${srlUser}"
-println "StormRunner Password: ${srlPassword}"
+println "StormRunner Server URL: ${srfServerUrl}"
+println "StormRunner User: ${srfUser}"
+println "StormRunner Password: ${srfPassword}"
 println "Tenant Id: ${tenantId}"
-println "Project Id: ${projectId}"
+println "Workspace Id: ${workspaceId}"
 println "Test Id: ${testId}"
 println "Debug mode value: ${debugMode}"
 if (debugMode) { props.setDebugLoggingMode() }
@@ -64,14 +64,14 @@ def testRunId
 // The main body of the plugin step - wrap it in a try/catch statement for handling any exceptions.
 //
 try {
-    SRLHelper srlClient = new SRLHelper(srlServerUrl, srlUser, srlPassword)
-    srlClient.setTenantId(tenantId)
-    srlClient.setSSL()
-    srlClient.login()
-    srlClient.setDebug(debugMode)
+    SRFHelper srfClient = new SRFHelper(srfServerUrl, srfUser, srfPassword)
+    srfClient.setTenantId(tenantId)
+    srfClient.setSSL()
+    srfClient.login()
+    srfClient.setDebug(debugMode)
 
-    testRunId = srlClient.runTest(Long.toString(projectId), Long.toString(testId))
-    String url = "${srlServerUrl}/run-overview/${testRunId}/dashboard/?TENANTID=${tenantId}&projectId=${projectId}"
+    testRunId = srfClient.runTest(Long.toString(workspaceId), Long.toString(testId))
+    String url = "${srfServerUrl}/workspace/${workspaceId}/results/${testRunId}/details?TENANTID=${tenantId}"
     println "Successfully started test ${testId} as run id: ${testRunId}"
     println "For details see: ${url}"
 

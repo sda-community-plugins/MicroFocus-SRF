@@ -1,11 +1,12 @@
 package test.com.serena.air.plugin.srf
 
-import com.serena.air.plugin.srl.SRFHelper
+import com.serena.air.plugin.srf.SRFHelper
 
-def srServerUrl = "https://stormrunner-load.saas.hpe.com"
+def srServerUrl = "https://ftaas-eu1.saas.hpe.com"
 def srUser = ""
 def srPassword = ""
-def srTenantId = 688301833
+def srTenantId = 711050852
+def workspaceId = "1000"
 
 SRFHelper srfClient = new SRFHelper(srServerUrl, srUser, srPassword)
 srfClient.setTenantId(srTenantId)
@@ -13,20 +14,24 @@ srfClient.setSSL()
 srfClient.setDebug(true)
 srfClient.login()
 
-def projectId = "1"
 def testId = "1"
 
-String runId = srfClient.runTest(projectId, testId)
+def runId = srfClient.runTest(workspaceId, testId)
 println "Test run id is ${runId}"
-String runStatus = srfClient.runStatus(runId)
-while (runStatus.equals("in-progress")) {
+
+String runStatus = srfClient.runStatus(workspaceId, runId)
+while (runStatus.equals("running")) {
     println "Test run ${runId} is in progress... sleeping..."
     sleep(10000)
-    runStatus = srfClient.runStatus(runId)
+    runStatus = srfClient.runStatus(workspaceId, runId)
 }
 println "Test ${runId} final status: ${runStatus}"
 
-def runResults = srfClient.runResults(runId)
+def runResults = srfClient.runResults(workspaceId, runId)
+println runResults
+
+def entity = runResults?.entities[0]
+println entity
 def sb = new StringBuilder()
 sb << """
 <style type='text/css'>
@@ -40,6 +45,8 @@ sb << """
     a:hover { text-decoration: none; }
     span { font-weight: bold; }
     span.failed { color: #df1e1e; }
+    span.errored { color: #df1e1e; }
+    span.completed { color: #32ad12; }
     span.success { color: #32ad12; }
     table { border-collapse: collapse; width: 100%; color: #333; }
     table td, table th { border: 1px solid #ddd; }
@@ -51,18 +58,16 @@ sb << """
 </style>
 """
 sb << "<div> <table> <tr> <th colspan='2'>Test Run: ${runId} </th> </tr>"
-sb << "<tr> <td> Date & time </td> <td> ${runResults?.dateTime} </td> </tr>"
-sb << "<tr> <td> Status </td> <td> <span class=" + (("PASSED".equalsIgnoreCase(runResults?.status)) ? "success >" : "failed >") +  runResults?.status + "</td> </tr>"
-sb << "<tr> <td> Duration </td> <td> ${runResults?.duration} </td> </tr>"
-sb << "<tr> <td> GUI Vusers </td> <td> " + srfClient.fNull(runResults?.uiVusers) + " </td> </tr>"
-sb << "<tr> <td> GUI VUH </td> <td> " + srfClient.fNull(runResults?.uiVUH) + " </td> </tr>"
-sb << "<tr> <td> Average Throughput </td> <td> " + srfClient.fNull(runResults?.averageThroughput) + " </td> </tr>"
-sb << "<tr> <td> Total Throughput </td> <td> " + srfClient.fNull(runResults?.totalThroughput) + " </td> </tr>"
-sb << "<tr> <td> Average Hits </td> <td> " + srfClient.fNull(runResults?.averageHits) + " </td> </tr>"
-sb << "<tr> <td> Total Hits </td> <td> " + srfClient.fNull(runResults?.totalHits) + " </td> </tr>"
-sb << "<tr> <td> Total Transactions Passed </td> <td> " + srfClient.fNull(runResults?.totalTransactionsPassed) + " </td> </tr>"
-sb << "<tr> <td> Total Transactions Failed </td> <td> " + srfClient.fNull(runResults?.totalTransactionsFailed) + " </td> </tr>"
-String url = "${srServerUrl}/run-overview/${runId}/dashboard/?TENANTID=${srTenantId}&projectId=${projectId}"
+sb << "<tr> <td> Test Name </td> <td> ${entity?.name} </td> </tr>"
+sb << "<tr> <td> Test Type </td> <td> ${entity?.testType} </td> </tr>"
+sb << "<tr> <td> Date & time </td> <td> ${entity?.start} </td> </tr>"
+sb << "<tr> <td> Status </td> <td> <span class=${entity?.status}> ${entity?.status} </span> </td> </tr>"
+sb << "<tr> <td> User </td> <td> ${entity?.user?.name} </td> </tr>"
+sb << "<tr> <td> Total Environments </td> <td> " + srfClient.fNull(entity?.additionalData?.environmentCount) + " </td> </tr>"
+sb << "<tr> <td> Total Scripts </td> <td> " + srfClient.fNull(entity?.additionalData?.scriptCount) + " </td> </tr>"
+sb << "<tr> <td> Total Scripts Successful </td> <td> " + srfClient.fNull(entity?.additionalData?.scriptStatus?.success) + " </td> </tr>"
+sb << "<tr> <td> Total Scripts Failed </td> <td> " + srfClient.fNull(entity?.additionalData?.scriptStatus?.failed) + " </td> </tr>"
+String url = "${srServerUrl}/workspace/${workspaceId}/results/${runId}/details?TENANTID=${srTenantId}"
 sb << "<tr> <td> Run URL" + "</td> <td> <a href='${url}'  target=_blank>" + url + "</a> </td> </tr>"
 sb << "<br>"
 sb << "</table> </div>"

@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://www.urbancode.com/PluginXMLSchema_v1">
     <header>
-        <identifier version="1" id="com.serena.air.plugin.MicroFocus-SRL"
-                    name="Micro Focus StormRunner Load"/>
+        <identifier version="1" id="com.serena.air.plugin.MicroFocus-SRF"
+                    name="Micro Focus StormRunner Functional"/>
         <description>
-            The Micro Focus StormRunner Load plugin enables you to execute load tests as part of your deployment process.
+            The Micro Focus StormRunner Functional plugin enables you to execute functional tests as part of your deployment process.
         </description>
-        <tag>Quality/Micro Focus/StormRunner Load</tag>
+        <tag>Quality/Micro Focus/StormRunner Functional</tag>
     </header>
     <!-- ==================================== -->
     <!--   PLUGIN STEPS                       -->
     <!-- ==================================== -->
     <step-type name="Run Test">
-        <description>Run a load test.</description>
+        <description>Run a functional test.</description>
         <properties>
-            <property name="projectId" required="true">
-                <property-ui type="textBox" default-value="${p:application/srl.projectId}" label="Project Id"
-                             description="The id of the project that contains the tests."/>
+            <property name="workspaceId" required="true">
+                <property-ui type="textBox" default-value="${p:application/srf.workspaceId}" label="Workspace Id"
+                             description="The id of the workspace that contains the tests."/>
             </property>
             <property name="testId" required="true">
                 <property-ui type="textBox" label="Test Id" description="The id of the test to run."/>
             </property>
-            <property name="srlServerUrl" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.serverUrl}" label="StormRunner Server URL"
-                             description="The StormRunner Load server URL, e.g. https://stormrunner-load.saas.hpe.com"/>
+            <property name="srfServerUrl" required="true">
+                <property-ui type="textBox" default-value="${p:system/srf.serverUrl}" label="StormRunner Server URL"
+                             description="The StormRunner Functional server URL, e.g. https://ftaas-eu1.saas.hpe.com"/>
             </property>
-            <property name="srlUser" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.user}" label="StormRunner User"
-                             description="The user id to be used to connect to the StormRunner Load server."/>
+            <property name="srfUser" required="true">
+                <property-ui type="textBox" default-value="${p:system/srf.user}" label="StormRunner User"
+                             description="The user id to be used to connect to the StormRunner Functional server."/>
             </property>
-            <property name="srlPassword" required="true">
-                <property-ui type="secureBox" default-value="${p:system/srl.password}" label="StormRunner Password"
-                             description="The password to be used to connect to the StormRunner Load server."/>
+            <property name="srfPassword" required="true">
+                <property-ui type="secureBox" default-value="${p:system/srf.password}" label="StormRunner Password"
+                             description="The password to be used to connect to the StormRunner Functional server."/>
             </property>
             <property name="tenantId" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.tenantId}" label="StormRunner Tenant Id"
-                             description="The tenant id on the Storm Runner Load server."/>
+                <property-ui type="textBox" default-value="${p:system/srf.tenantId}" label="StormRunner Tenant Id"
+                             description="The tenant id on the Storm Runner Functional server."/>
             </property>
             <property name="debugMode" required="false">
                 <property-ui type="checkBox" label="Debug Output" hidden="true"
@@ -80,11 +80,11 @@
         </command>
     </step-type>
     <step-type name="Check Status">
-        <description>Check the status of load test run.</description>
+        <description>Check the status of functional test run.</description>
         <properties>
-            <property name="projectId" required="true">
-                <property-ui type="textBox" default-value="${p:application/srl.projectId}" label="Project Id"
-                             description="The id of the project that contains the tests."/>
+            <property name="workspaceId" required="true">
+                <property-ui type="textBox" default-value="${p:application/srf.workspaceId}" label="Workspace Id"
+                             description="The id of the workspace that contains the tests."/>
             </property>
             <property name="runId" required="true">
                 <property-ui type="textBox" label="Test Run Id" default-value="${p:prevStep/testRunId}"
@@ -98,21 +98,21 @@
                 <property-ui type="textBox" default-value="60" label="Poll Interval"
                              description="Interval in seconds between polls, default is 60s."/>
             </property>
-            <property name="srlServerUrl" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.serverUrl}" label="StormRunner Server URL"
-                             description="The StormRunner Load server URL, e.g. https://stormrunner-load.saas.hpe.com"/>
+            <property name="srfServerUrl" required="true">
+                <property-ui type="textBox" default-value="${p:system/srf.serverUrl}" label="StormRunner Server URL"
+                             description="The StormRunner Functional server URL, e.g. https://ftaas-eu1.saas.hpe.com"/>
             </property>
-            <property name="srlUser" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.user}" label="StormRunner User"
-                             description="The user id to be used to connect to the StormRunner Load server."/>
+            <property name="srfUser" required="true">
+                <property-ui type="textBox" default-value="${p:system/srf.user}" label="StormRunner User"
+                             description="The user id to be used to connect to the StormRunner Functional server."/>
             </property>
-            <property name="srlPassword" required="true">
-                <property-ui type="secureBox" default-value="${p:system/srl.password}" label="StormRunner Password"
-                             description="The password to be used to connect to the StormRunner Load server."/>
+            <property name="srfPassword" required="true">
+                <property-ui type="secureBox" default-value="${p:system/srf.password}" label="StormRunner Password"
+                             description="The password to be used to connect to the StormRunner Functional server."/>
             </property>
             <property name="tenantId" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.tenantId}" label="StormRunner Tenant Id"
-                             description="The tenant id on the Storm Runner Load server."/>
+                <property-ui type="textBox" default-value="${p:system/srf.tenantId}" label="StormRunner Tenant Id"
+                             description="The tenant id on the Storm Runner Functional server."/>
             </property>
             <property name="debugMode" required="false">
                 <property-ui type="checkBox" label="Debug Output" hidden="true"
@@ -140,9 +140,9 @@
     <step-type name="Publish Results to HTML">
         <description>Publish the results of a test run to a file in HTML format.</description>
         <properties>
-            <property name="projectId" required="true">
-                <property-ui type="textBox" default-value="${p:application/srl.projectId}" label="Project Id"
-                             description="The id of the project that contains the tests."/>
+            <property name="workspaceId" required="true">
+                <property-ui type="textBox" default-value="${p:application/srf.workspaceId}" label="Workspace Id"
+                             description="The id of the workspace that contains the tests."/>
             </property>
             <property name="runId" required="true" >
                 <property-ui type="textBox" label="Test Run Id" default-value="${p:prevStep/testRunId}"
@@ -152,21 +152,21 @@
                 <property-ui type="textBox" default-value="results.html" label="Output File"
                              description="The name of the output file to create, default is 'results.html'."/>
             </property>
-            <property name="srlServerUrl" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.serverUrl}" label="StormRunner Server URL"
-                             description="The StormRunner Load server URL, e.g. https://stormrunner-load.saas.hpe.com"/>
+            <property name="srfServerUrl" required="true">
+                <property-ui type="textBox" default-value="${p:system/srf.serverUrl}" label="StormRunner Server URL"
+                             description="The StormRunner Functional server URL, e.g. https://ftaas-eu1.saas.hpe.com"/>
             </property>
-            <property name="srlUser" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.user}" label="StormRunner User"
-                             description="The user id to be used to connect to the StormRunner Load server."/>
+            <property name="srfUser" required="true">
+                <property-ui type="textBox" default-value="${p:system/srf.user}" label="StormRunner User"
+                             description="The user id to be used to connect to the StormRunner Functional server."/>
             </property>
-            <property name="srlPassword" required="true">
-                <property-ui type="secureBox" default-value="${p:system/srl.password}" label="StormRunner Password"
-                             description="The password to be used to connect to the StormRunner Load server."/>
+            <property name="srfPassword" required="true">
+                <property-ui type="secureBox" default-value="${p:system/srf.password}" label="StormRunner Password"
+                             description="The password to be used to connect to the StormRunner Functional server."/>
             </property>
             <property name="tenantId" required="true">
-                <property-ui type="textBox" default-value="${p:system/srl.tenantId}" label="StormRunner Tenant Id"
-                             description="The tenant id on the Storm Runner Load server."/>
+                <property-ui type="textBox" default-value="${p:system/srf.tenantId}" label="StormRunner Tenant Id"
+                             description="The tenant id on the Storm Runner Functional server."/>
             </property>
             <property name="debugMode" required="false">
                 <property-ui type="checkBox" label="Debug Output" hidden="true"
